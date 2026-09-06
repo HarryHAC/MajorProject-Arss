@@ -280,6 +280,32 @@ TIMELINE.forEach(([ph, t, d], i) => {
   $("#timeline").appendChild(card);
 });
 
+// timeline table — structured overview (reflects the saved status/edits from the cards)
+(function () {
+  const tbl = $("#timelineTable");
+  if (!tbl) return;
+  const tagOf = (x) =>
+    x === "done"
+      ? '<span class="tag done">Completed</span>'
+      : x === "wip"
+        ? '<span class="tag wip">In Progress</span>'
+        : '<span class="tag">Planned</span>';
+  let h =
+    "<thead><tr><th>Phase</th><th>Milestone</th><th>Description</th><th>Status</th></tr></thead><tbody>";
+  TIMELINE.forEach(([ph, t, d], i) => {
+    const kp = "arss-tl-" + i + "-";
+    const title = LS.get(kp + "t") || t;
+    const desc = LS.get(kp + "d") || d;
+    const st = LS.get(kp + "status") || TIMELINE_STATUS[i];
+    h +=
+      `<tr><td class="mono" style="color:var(--cyan)">${ph}</td>` +
+      `<td>${title}</td>` +
+      `<td style="color:var(--dim);font-weight:300">${desc}</td>` +
+      `<td>${tagOf(st)}</td></tr>`;
+  });
+  tbl.innerHTML = h + "</tbody>";
+})();
+
 // reviews — editable status + fields, saved on this device
 REVIEWS.forEach((r, i) => {
   const kp = "arss-rev-" + i + "-";
