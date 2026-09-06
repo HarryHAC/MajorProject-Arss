@@ -280,7 +280,7 @@ TIMELINE.forEach(([ph, t, d], i) => {
   $("#timeline").appendChild(card);
 });
 
-// timeline table — structured overview (reflects the saved status/edits from the cards)
+// timeline table — editable overview (shares saved status/edits with the cards)
 (function () {
   const tbl = $("#timelineTable");
   if (!tbl) return;
@@ -290,20 +290,34 @@ TIMELINE.forEach(([ph, t, d], i) => {
       : x === "wip"
         ? '<span class="tag wip">In Progress</span>'
         : '<span class="tag">Planned</span>';
-  let h =
-    "<thead><tr><th>Phase</th><th>Milestone</th><th>Description</th><th>Status</th></tr></thead><tbody>";
+  tbl.innerHTML =
+    "<thead><tr><th>Phase</th><th>Milestone</th><th>Description</th><th>Status</th></tr></thead><tbody></tbody>";
+  const tb = $("tbody", tbl);
   TIMELINE.forEach(([ph, t, d], i) => {
     const kp = "arss-tl-" + i + "-";
-    const title = LS.get(kp + "t") || t;
-    const desc = LS.get(kp + "d") || d;
-    const st = LS.get(kp + "status") || TIMELINE_STATUS[i];
-    h +=
-      `<tr><td class="mono" style="color:var(--cyan)">${ph}</td>` +
-      `<td>${title}</td>` +
-      `<td style="color:var(--dim);font-weight:300">${desc}</td>` +
-      `<td>${tagOf(st)}</td></tr>`;
+    let s = LS.get(kp + "status") || TIMELINE_STATUS[i];
+    const tr = el("tr");
+    tr.innerHTML =
+      `<td class="mono" style="color:var(--cyan)">${ph}</td>` +
+      `<td><span data-f="t">${LS.get(kp + "t") || t}</span></td>` +
+      `<td style="color:var(--dim);font-weight:300"><span data-f="d">${LS.get(kp + "d") || d}</span></td>` +
+      `<td class="st-cell"></td>`;
+    const stc = $(".st-cell", tr);
+    const renderSt = () => {
+      stc.innerHTML =
+        tagOf(s) +
+        ` <button class="ministat" type="button" title="Change status">${IC.edit}</button>`;
+      $(".ministat", stc).onclick = () => {
+        s = s === "plan" ? "wip" : s === "wip" ? "done" : "plan";
+        LS.set(kp + "status", s);
+        renderSt();
+      };
+    };
+    renderSt();
+    makeEditable($('[data-f="t"]', tr), kp + "t", {});
+    makeEditable($('[data-f="d"]', tr), kp + "d", { multiline: true });
+    tb.appendChild(tr);
   });
-  tbl.innerHTML = h + "</tbody>";
 })();
 
 // reviews — editable status + fields, saved on this device

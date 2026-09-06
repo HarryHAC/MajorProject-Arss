@@ -2183,6 +2183,17 @@ footer {
   fill: none;
   stroke-width: 1.8;
 }
+/* status cell inside the editable timeline table */
+.st-cell {
+  white-space: nowrap;
+}
+.st-cell .tag,
+.st-cell .ministat {
+  vertical-align: middle;
+}
+.st-cell .ministat {
+  margin-left: 0.4rem;
+}
 /* component panel image slot */
 .sp-media {
   position: relative;
